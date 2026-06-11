@@ -13,6 +13,67 @@ body {
   min-height: 100vh;
 }
 
+/* Welcome banner */
+.welcome-banner {
+  text-align: center;
+  padding: 2rem 1rem 1.5rem;
+}
+
+.welcome-greeting {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.welcome-subtitle {
+  color: #8b949e;
+  font-size: 0.95rem;
+  max-width: 480px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* Stats row */
+.stats-row {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  background: #161b22;
+}
+
+.stat-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.stat-value {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.stat-label {
+  color: #8b949e;
+  font-size: 0.75rem;
+  margin-top: 0.15rem;
+}
+
+/* Items section heading */
+.items-section h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
 /* Layout */
 .app-layout {
   display: flex;

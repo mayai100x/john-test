@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { fetchItems, createItem, deleteItem, checkHealth } from '../api/client';
-import { addActivityEntry } from '../lib/activityLog';
+import { addActivityEntry, getActivityLog } from '../lib/activityLog';
 
 interface Item {
   id: string;
@@ -16,6 +16,7 @@ export function HomePage() {
   const [desc, setDesc] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [activityCount, setActivityCount] = useState(0);
 
   const load = async () => {
     try {
@@ -30,6 +31,7 @@ export function HomePage() {
 
   useEffect(() => {
     load();
+    setActivityCount(getActivityLog().length);
   }, []);
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -43,6 +45,7 @@ export function HomePage() {
       setName('');
       setDesc('');
       await load();
+      setActivityCount(getActivityLog().length);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -55,6 +58,7 @@ export function HomePage() {
       await deleteItem(id);
       addActivityEntry('deleted', itemName);
       await load();
+      setActivityCount(getActivityLog().length);
     } catch (e) {
       setError((e as Error).message);
     }
@@ -62,12 +66,37 @@ export function HomePage() {
 
   return (
     <div className="container">
-      <header>
-        <h1>🧪 John Test</h1>
-        <span className={`badge ${status === 'ok' ? 'ok' : 'err'}`}>
-          API: {status}
-        </span>
-      </header>
+      <section className="welcome-banner">
+        <h1 className="welcome-greeting">Welcome back! 👋</h1>
+        <p className="welcome-subtitle">
+          Your lightweight dashboard for managing items and tracking activity —
+          all in one place.
+        </p>
+      </section>
+
+      <section className="stats-row">
+        <div className="stat-card">
+          <span className="stat-icon">📦</span>
+          <div>
+            <div className="stat-value">{items.length}</div>
+            <div className="stat-label">Total Items</div>
+          </div>
+        </div>
+        <div className="stat-card">
+          <span className="stat-icon">{status === 'ok' ? '🟢' : '🔴'}</span>
+          <div>
+            <div className="stat-value">{status === 'ok' ? 'Online' : status}</div>
+            <div className="stat-label">API Status</div>
+          </div>
+        </div>
+        <div className="stat-card">
+          <span className="stat-icon">📋</span>
+          <div>
+            <div className="stat-value">{activityCount}</div>
+            <div className="stat-label">Activity Entries</div>
+          </div>
+        </div>
+      </section>
 
       {error && (
         <div className="error-banner" onClick={() => setError(null)}>
@@ -75,40 +104,43 @@ export function HomePage() {
         </div>
       )}
 
-      <form onSubmit={handleCreate} className="create-form">
-        <input
-          placeholder="Item name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <input
-          placeholder="Description"
-          value={desc}
-          onChange={(e) => setDesc(e.target.value)}
-        />
-        <button type="submit" disabled={loading}>
-          {loading ? 'Creating...' : 'Add Item'}
-        </button>
-      </form>
+      <section className="items-section">
+        <h2>Items</h2>
+        <form onSubmit={handleCreate} className="create-form">
+          <input
+            placeholder="Item name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <input
+            placeholder="Description"
+            value={desc}
+            onChange={(e) => setDesc(e.target.value)}
+          />
+          <button type="submit" disabled={loading}>
+            {loading ? 'Creating...' : 'Add Item'}
+          </button>
+        </form>
 
-      <div className="items">
-        {items.length === 0 && <p className="empty">No items yet. Create one above!</p>}
-        {items.map((item) => (
-          <div key={item.id} className="card">
-            <div>
-              <h3>{item.name}</h3>
-              <p>{item.description}</p>
-              <small>{new Date(item.createdAt).toLocaleString()}</small>
+        <div className="items">
+          {items.length === 0 && <p className="empty">No items yet. Create one above!</p>}
+          {items.map((item) => (
+            <div key={item.id} className="card">
+              <div>
+                <h3>{item.name}</h3>
+                <p>{item.description}</p>
+                <small>{new Date(item.createdAt).toLocaleString()}</small>
+              </div>
+              <button
+                className="delete-btn"
+                onClick={() => handleDelete(item.id, item.name)}
+              >
+                ✕
+              </button>
             </div>
-            <button
-              className="delete-btn"
-              onClick={() => handleDelete(item.id, item.name)}
-            >
-              ✕
-            </button>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
