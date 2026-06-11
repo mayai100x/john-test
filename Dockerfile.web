@@ -1,0 +1,13 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY package.json tsconfig.base.json ./
+COPY packages/web/package.json packages/web/tsconfig.json packages/web/vite.config.ts packages/web/index.html packages/web/
+
+RUN npm install -w packages/web
+
+COPY packages/web/src packages/web/src
+
+EXPOSE 3000
+CMD ["npm", "run", "dev", "-w", "packages/web", "--", "--host", "0.0.0.0"]
