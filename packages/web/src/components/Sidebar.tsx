@@ -8,7 +8,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
-  const [collapsed, setCollapsed] = useState(true);
+  const [collapsed, setCollapsed] = useState(window.innerWidth < 768);
 
   const navItems: { page: Page; label: string; icon: string }[] = [
     { page: 'home', label: 'Home', icon: '🏠' },
