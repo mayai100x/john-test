@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { fetchItems, createItem, deleteItem, checkHealth } from '../api/client';
+import { addActivityEntry } from '../lib/activityLog';
 
 interface Item {
   id: string;
@@ -38,6 +39,7 @@ export function HomePage() {
     setLoading(true);
     try {
       await createItem(name, desc);
+      addActivityEntry('created', name);
       setName('');
       setDesc('');
       await load();
@@ -48,9 +50,10 @@ export function HomePage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: string, itemName: string) => {
     try {
       await deleteItem(id);
+      addActivityEntry('deleted', itemName);
       await load();
     } catch (e) {
       setError((e as Error).message);
@@ -99,7 +102,7 @@ export function HomePage() {
             </div>
             <button
               className="delete-btn"
-              onClick={() => handleDelete(item.id)}
+              onClick={() => handleDelete(item.id, item.name)}
             >
               ✕
             </button>
