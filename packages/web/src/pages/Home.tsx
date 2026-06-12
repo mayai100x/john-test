@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { fetchItems, createItem, deleteItem, checkHealth } from '../api/client';
+import { fetchItems, createItem, deleteItem, updateItem, checkHealth } from '../api/client';
 import { addActivityEntry, getActivityLog } from '../lib/activityLog';
 
 interface Item {
@@ -17,6 +17,12 @@ export function HomePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activityCount, setActivityCount] = useState(0);
+
+  // Inline edit state
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editDesc, setEditDesc] = useState('');
+  const [saving, setSaving] = useState(false);
 
   const load = async () => {
     try {
@@ -61,6 +67,47 @@ export function HomePage() {
       setActivityCount(getActivityLog().length);
     } catch (e) {
       setError((e as Error).message);
+    }
+  };
+
+  const startEdit = (item: Item) => {
+    setEditingId(item.id);
+    setEditName(item.name);
+    setEditDesc(item.description);
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditName('');
+    setEditDesc('');
+  };
+
+  const handleSave = async (id: string, itemName: string) => {
+    if (!editName.trim() && !editDesc.trim()) return;
+
+    setSaving(true);
+    try {
+      const original = items.find((it) => it.id === id);
+      const fields: { name?: string; description?: string } = {};
+
+      if (editName !== itemName) fields.name = editName;
+      if (original && editDesc !== original.description) fields.description = editDesc;
+
+      // No changes — just cancel
+      if (Object.keys(fields).length === 0) {
+        cancelEdit();
+        return;
+      }
+
+      await updateItem(id, fields);
+      addActivityEntry('updated', editName || itemName);
+      cancelEdit();
+      await load();
+      setActivityCount(getActivityLog().length);
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -126,17 +173,54 @@ export function HomePage() {
           {items.length === 0 && <p className="empty">No items yet. Create one above!</p>}
           {items.map((item) => (
             <div key={item.id} className="card">
-              <div>
-                <h3>{item.name}</h3>
-                <p>{item.description}</p>
-                <small>{new Date(item.createdAt).toLocaleString()}</small>
-              </div>
-              <button
-                className="delete-btn"
-                onClick={() => handleDelete(item.id, item.name)}
-              >
-                ✕
-              </button>
+              {editingId === item.id ? (
+                <div className="edit-form">
+                  <input
+                    className="edit-input"
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    placeholder="Item name"
+                    disabled={saving}
+                  />
+                  <input
+                    className="edit-input"
+                    value={editDesc}
+                    onChange={(e) => setEditDesc(e.target.value)}
+                    placeholder="Description"
+                    disabled={saving}
+                  />
+                  <div className="edit-actions">
+                    <button
+                      className="save-btn"
+                      onClick={() => handleSave(item.id, item.name)}
+                      disabled={saving}
+                    >
+                      {saving ? 'Saving...' : 'Save'}
+                    </button>
+                    <button
+                      className="cancel-btn"
+                      onClick={cancelEdit}
+                      disabled={saving}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div onClick={() => startEdit(item)} style={{ cursor: 'pointer', flex: 1 }}>
+                  <h3>{item.name}</h3>
+                  <p>{item.description}</p>
+                  <small>{new Date(item.createdAt).toLocaleString()}</small>
+                </div>
+              )}
+              {editingId !== item.id && (
+                <button
+                  className="delete-btn"
+                  onClick={() => handleDelete(item.id, item.name)}
+                >
+                  ✕
+                </button>
+              )}
             </div>
           ))}
         </div>

@@ -226,6 +226,73 @@ header h1 {
   color: #c73a3a;
 }
 
+/* Inline edit */
+.edit-form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.edit-input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d4cdc2;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #2c2c2c;
+  font-size: 0.875rem;
+  font-family: inherit;
+}
+
+.edit-input:focus {
+  outline: none;
+  border-color: #5b9bd5;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.save-btn,
+.cancel-btn {
+  padding: 0.4rem 0.75rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.save-btn {
+  background: #3da55d;
+  color: white;
+}
+
+.save-btn:hover {
+  background: #35954d;
+}
+
+.save-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cancel-btn {
+  background: #f5f1eb;
+  color: #2c2c2c;
+}
+
+.cancel-btn:hover {
+  background: #e8e3d9;
+}
+
+.cancel-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* Sidebar */
 .sidebar {
   width: 220px;
