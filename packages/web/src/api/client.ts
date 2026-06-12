@@ -12,8 +12,9 @@ interface ItemsResponse {
   total: number;
 }
 
-export async function fetchItems(): Promise<ItemsResponse> {
-  const res = await fetch(`${API_BASE}/items`);
+export async function fetchItems(query?: string): Promise<ItemsResponse> {
+  const params = query ? `?q=${encodeURIComponent(query)}` : '';
+  const res = await fetch(`${API_BASE}/items${params}`);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
 }

@@ -21,11 +21,23 @@ interface Item {
 }
 
 // GET /api/items
-itemsRouter.get('/', (_req: Request, res: Response) => {
+itemsRouter.get('/', (req: Request, res: Response) => {
   const db = getDb();
-  const rows = db
-    .prepare('SELECT id, name, description, created_at AS createdAt FROM items ORDER BY created_at DESC')
-    .all() as Item[];
+  const q = (req.query.q as string || '').trim();
+
+  let rows: Item[];
+  if (q) {
+    const searchTerm = `%${q}%`;
+    rows = db
+      .prepare(
+        'SELECT id, name, description, created_at AS createdAt FROM items WHERE name LIKE ? OR description LIKE ? ORDER BY created_at DESC'
+      )
+      .all(searchTerm, searchTerm) as Item[];
+  } else {
+    rows = db
+      .prepare('SELECT id, name, description, created_at AS createdAt FROM items ORDER BY created_at DESC')
+      .all() as Item[];
+  }
   res.json({ data: rows, total: rows.length });
 });
 

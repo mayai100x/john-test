@@ -17,22 +17,40 @@ export function HomePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activityCount, setActivityCount] = useState(0);
+  const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [allTotal, setAllTotal] = useState(0);
 
-  const load = async () => {
+  const load = async (query?: string) => {
     try {
-      const [itemsRes, health] = await Promise.all([fetchItems(), checkHealth()]);
+      const trimmedQuery = query?.trim() || undefined;
+      const [itemsRes, health] = await Promise.all([
+        fetchItems(trimmedQuery),
+        checkHealth(),
+      ]);
       setItems(itemsRes.data);
       setStatus(health.status);
       setError(null);
+      if (!trimmedQuery) {
+        setAllTotal(itemsRes.total);
+      }
     } catch (e) {
       setError((e as Error).message);
     }
   };
 
   useEffect(() => {
-    load();
     setActivityCount(getActivityLog().length);
   }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search), 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  useEffect(() => {
+    load(debouncedSearch);
+  }, [debouncedSearch]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +62,7 @@ export function HomePage() {
       addActivityEntry('created', name);
       setName('');
       setDesc('');
-      await load();
+      await load(debouncedSearch);
       setActivityCount(getActivityLog().length);
     } catch (e) {
       setError((e as Error).message);
@@ -57,7 +75,7 @@ export function HomePage() {
     try {
       await deleteItem(id);
       addActivityEntry('deleted', itemName);
-      await load();
+      await load(debouncedSearch);
       setActivityCount(getActivityLog().length);
     } catch (e) {
       setError((e as Error).message);
@@ -72,6 +90,27 @@ export function HomePage() {
           Your lightweight dashboard for managing items and tracking activity —
           all in one place.
         </p>
+      </section>
+
+      <section className="search-bar">
+        <div className="search-input-wrapper">
+          <input
+            type="text"
+            className="search-input"
+            placeholder="Search items..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          {search && (
+            <button
+              className="search-clear"
+              onClick={() => setSearch('')}
+              aria-label="Clear search"
+            >
+              ✕
+            </button>
+          )}
+        </div>
       </section>
 
       <section className="stats-row">
@@ -123,7 +162,17 @@ export function HomePage() {
         </form>
 
         <div className="items">
-          {items.length === 0 && <p className="empty">No items yet. Create one above!</p>}
+          {debouncedSearch && items.length > 0 && (
+            <p className="results-count">
+              Showing {items.length} of {allTotal} items
+            </p>
+          )}
+          {items.length === 0 && !debouncedSearch && (
+            <p className="empty">No items yet. Create one above!</p>
+          )}
+          {items.length === 0 && debouncedSearch && (
+            <p className="empty">No items match "{debouncedSearch}"</p>
+          )}
           {items.map((item) => (
             <div key={item.id} className="card">
               <div>
