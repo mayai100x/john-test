@@ -8,8 +8,8 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #0d1117;
-  color: #c9d1d9;
+  background: #faf8f5;
+  color: #2c2c2c;
   min-height: 100vh;
 }
 
@@ -111,19 +111,19 @@ header h1 {
 }
 
 .badge.ok {
-  background: #238636;
+  background: #3da55d;
   color: #fff;
 }
 
 .badge.err {
-  background: #da3633;
+  background: #c73a3a;
   color: #fff;
 }
 
 .error-banner {
-  background: #da363322;
-  border: 1px solid #da3633;
-  color: #f85149;
+  background: #fef0f0;
+  border: 1px solid #f0c0c0;
+  color: #b53333;
   padding: 0.75rem 1rem;
   border-radius: 8px;
   margin-bottom: 1rem;
@@ -140,23 +140,23 @@ header h1 {
 .create-form input {
   flex: 1;
   padding: 0.5rem 0.75rem;
-  border: 1px solid #30363d;
+  border: 1px solid #d4cdc2;
   border-radius: 6px;
-  background: #161b22;
-  color: #c9d1d9;
+  background: #ffffff;
+  color: #2c2c2c;
   font-size: 0.875rem;
 }
 
 .create-form input:focus {
   outline: none;
-  border-color: #58a6ff;
+  border-color: #5b9bd5;
 }
 
 .create-form button {
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 6px;
-  background: #238636;
+  background: #3da55d;
   color: white;
   font-size: 0.875rem;
   font-weight: 500;
@@ -165,7 +165,7 @@ header h1 {
 }
 
 .create-form button:hover {
-  background: #2ea043;
+  background: #35954d;
 }
 
 .create-form button:disabled {
@@ -181,7 +181,7 @@ header h1 {
 
 .empty {
   text-align: center;
-  color: #8b949e;
+  color: #8c8580;
   padding: 2rem 0;
 }
 
@@ -190,9 +190,9 @@ header h1 {
   justify-content: space-between;
   align-items: flex-start;
   padding: 1rem;
-  border: 1px solid #30363d;
+  border: 1px solid #e8e3d9;
   border-radius: 8px;
-  background: #161b22;
+  background: #ffffff;
 }
 
 .card h3 {
@@ -201,20 +201,20 @@ header h1 {
 }
 
 .card p {
-  color: #8b949e;
+  color: #8c8580;
   font-size: 0.875rem;
   margin-bottom: 0.5rem;
 }
 
 .card small {
-  color: #484f58;
+  color: #b8b2a8;
   font-size: 0.75rem;
 }
 
 .delete-btn {
   border: none;
   background: none;
-  color: #8b949e;
+  color: #8c8580;
   font-size: 1rem;
   cursor: pointer;
   padding: 0.25rem 0.5rem;
@@ -222,16 +222,16 @@ header h1 {
 }
 
 .delete-btn:hover {
-  background: #30363d;
-  color: #f85149;
+  background: #f5f1eb;
+  color: #c73a3a;
 }
 
 /* Sidebar */
 .sidebar {
   width: 220px;
   flex-shrink: 0;
-  background: #161b22;
-  border-right: 1px solid #30363d;
+  background: #f5f1eb;
+  border-right: 1px solid #e8e3d9;
   padding: 1rem;
   display: flex;
   flex-direction: column;
@@ -260,7 +260,7 @@ header h1 {
   border: none;
   border-radius: 6px;
   background: none;
-  color: #8b949e;
+  color: #8c8580;
   font-size: 0.875rem;
   cursor: pointer;
   text-align: left;
@@ -268,13 +268,13 @@ header h1 {
 }
 
 .sidebar-link:hover {
-  background: #21262d;
-  color: #c9d1d9;
+  background: #efe9e0;
+  color: #2c2c2c;
 }
 
 .sidebar-link.active {
-  background: #1f6feb22;
-  color: #58a6ff;
+  background: #e8f0fe;
+  color: #3b7dd8;
 }
 
 .sidebar-icon {
@@ -291,10 +291,10 @@ header h1 {
   left: 0.75rem;
   z-index: 50;
   padding: 0.5rem 0.65rem;
-  border: 1px solid #30363d;
+  border: 1px solid #e8e3d9;
   border-radius: 6px;
-  background: #161b22;
-  color: #c9d1d9;
+  background: #ffffff;
+  color: #2c2c2c;
   font-size: 1.25rem;
   cursor: pointer;
   line-height: 1;
@@ -304,7 +304,7 @@ header h1 {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.3);
   z-index: 30;
 }
 
@@ -320,7 +320,7 @@ header h1 {
 }
 
 .activity-action {
-  color: #8b949e;
+  color: #8c8580;
   font-weight: 400;
 }
 
