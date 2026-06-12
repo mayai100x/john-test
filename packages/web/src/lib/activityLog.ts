@@ -1,6 +1,6 @@
 export interface ActivityEntry {
   id: string;
-  action: 'created' | 'deleted';
+  action: 'created' | 'deleted' | 'updated';
   itemName: string;
   timestamp: string;
 }
@@ -24,7 +24,7 @@ export function getActivityLog(): ActivityEntry[] {
   return readLog();
 }
 
-export function addActivityEntry(action: 'created' | 'deleted', itemName: string): void {
+export function addActivityEntry(action: 'created' | 'deleted' | 'updated', itemName: string): void {
   const entries = readLog();
   entries.unshift({
     id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),

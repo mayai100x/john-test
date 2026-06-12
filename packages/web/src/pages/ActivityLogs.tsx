@@ -23,13 +23,13 @@ export function ActivityLogsPage() {
           {entries.map((entry) => (
             <div key={entry.id} className="card activity-entry">
               <div className="activity-icon">
-                {entry.action === 'created' ? '➕' : '🗑️'}
+                {entry.action === 'created' ? '➕' : entry.action === 'deleted' ? '🗑️' : '📝'}
               </div>
               <div>
                 <p>
                   <strong>{entry.itemName}</strong>{' '}
                   <span className="activity-action">
-                    {entry.action === 'created' ? 'created' : 'deleted'}
+                    {entry.action === 'created' ? 'created' : entry.action === 'deleted' ? 'deleted' : 'updated'}
                   </span>
                 </p>
                 <small>{new Date(entry.timestamp).toLocaleString()}</small>
