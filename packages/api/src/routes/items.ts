@@ -1,8 +1,18 @@
 import { Router, Request, Response } from 'express';
+import crypto from 'crypto';
+import { getDb } from '../db/database';
 
 export const itemsRouter = Router();
 
-// In-memory store (simple for testing)
+// Row shape from SQLite (snake_case columns)
+interface ItemRow {
+  id: string;
+  name: string;
+  description: string;
+  created_at: string;
+}
+
+// Response shape (camelCase — matched by SQL alias)
 interface Item {
   id: string;
   name: string;
@@ -10,23 +20,33 @@ interface Item {
   createdAt: string;
 }
 
-let items: Item[] = [
-  {
-    id: '1',
-    name: 'Sample Item',
-    description: 'This is a test item from the API',
-    createdAt: new Date().toISOString(),
-  },
-];
-
 // GET /api/items
-itemsRouter.get('/', (_req: Request, res: Response) => {
-  res.json({ data: items, total: items.length });
+itemsRouter.get('/', (req: Request, res: Response) => {
+  const db = getDb();
+  const q = (req.query.q as string || '').trim();
+
+  let rows: Item[];
+  if (q) {
+    const searchTerm = `%${q}%`;
+    rows = db
+      .prepare(
+        'SELECT id, name, description, created_at AS createdAt FROM items WHERE name LIKE ? OR description LIKE ? ORDER BY created_at DESC'
+      )
+      .all(searchTerm, searchTerm) as Item[];
+  } else {
+    rows = db
+      .prepare('SELECT id, name, description, created_at AS createdAt FROM items ORDER BY created_at DESC')
+      .all() as Item[];
+  }
+  res.json({ data: rows, total: rows.length });
 });
 
 // GET /api/items/:id
 itemsRouter.get('/:id', (req: Request, res: Response) => {
-  const item = items.find((i) => i.id === req.params.id);
+  const db = getDb();
+  const item = db
+    .prepare('SELECT id, name, description, created_at AS createdAt FROM items WHERE id = ?')
+    .get(req.params.id) as Item | undefined;
   if (!item) {
     res.status(404).json({ error: 'Item not found' });
     return;
@@ -42,23 +62,28 @@ itemsRouter.post('/', (req: Request, res: Response) => {
     return;
   }
 
-  const item: Item = {
-    id: String(items.length + 1),
+  const db = getDb();
+  const id = crypto.randomUUID();
+  const createdAt = new Date().toISOString();
+
+  db.prepare('INSERT INTO items (id, name, description, created_at) VALUES (?, ?, ?, ?)').run(
+    id,
     name,
     description,
-    createdAt: new Date().toISOString(),
-  };
-  items.push(item);
+    createdAt
+  );
+
+  const item: Item = { id, name, description, createdAt };
   res.status(201).json({ data: item });
 });
 
 // DELETE /api/items/:id
 itemsRouter.delete('/:id', (req: Request, res: Response) => {
-  const index = items.findIndex((i) => i.id === req.params.id);
-  if (index === -1) {
+  const db = getDb();
+  const result = db.prepare('DELETE FROM items WHERE id = ?').run(req.params.id);
+  if (result.changes === 0) {
     res.status(404).json({ error: 'Item not found' });
     return;
   }
-  items.splice(index, 1);
   res.json({ message: 'Item deleted' });
 });

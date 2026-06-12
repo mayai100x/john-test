@@ -33,6 +33,59 @@ body {
   line-height: 1.5;
 }
 
+/* Search bar */
+.search-bar {
+  margin-bottom: 1.5rem;
+}
+
+.search-input-wrapper {
+  position: relative;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.625rem 2rem 0.625rem 0.75rem;
+  border: 1px solid #d4cdc2;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #2c2c2c;
+  font-size: 0.875rem;
+  font-family: inherit;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #5b9bd5;
+}
+
+.search-clear {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: none;
+  color: #8c8580;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+.search-clear:hover {
+  background: #f5f1eb;
+  color: #2c2c2c;
+}
+
+/* Results count */
+.results-count {
+  text-align: center;
+  color: #8c8580;
+  font-size: 0.8rem;
+  padding-bottom: 0.5rem;
+}
+
 /* Stats row */
 .stats-row {
   display: flex;
