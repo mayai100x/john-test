@@ -36,6 +36,20 @@ export async function deleteItem(id: string): Promise<void> {
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
 }
 
+export async function updateItem(
+  id: string,
+  name?: string,
+  description?: string
+): Promise<{ data: Item }> {
+  const res = await fetch(`${API_BASE}/items/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, description }),
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
 export async function checkHealth(): Promise<{ status: string }> {
   const res = await fetch('/health');
   return res.json();

@@ -23,7 +23,7 @@ export function ActivityLogsPage() {
           {entries.map((entry) => (
             <div key={entry.id} className="card activity-entry">
               <div className="activity-icon">
-                {entry.action === 'created' ? '➕' : '🗑️'}
+                {entry.action === 'created' ? '➕' : entry.action === 'deleted' ? '🗑️' : '📝'}
               </div>
               <div>
                 <p>

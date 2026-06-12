@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { getAllItems, getItemById, createItem, deleteItem } from '../db/database';
+import { getAllItems, getItemById, createItem, deleteItem, updateItem } from '../db/database';
 
 export const itemsRouter = Router();
 
@@ -29,6 +29,25 @@ itemsRouter.post('/', (req: Request, res: Response) => {
 
   const item = createItem(name, description);
   res.status(201).json({ data: item });
+});
+
+// PUT /api/items/:id
+itemsRouter.put('/:id', (req: Request, res: Response) => {
+  const { name, description } = req.body;
+
+  // 400 if body is empty or both fields missing
+  if (!name && !description) {
+    res.status(400).json({ error: 'At least one of name or description is required' });
+    return;
+  }
+
+  const item = updateItem(req.params.id, { name, description });
+  if (!item) {
+    res.status(404).json({ error: 'Item not found' });
+    return;
+  }
+
+  res.json({ data: item });
 });
 
 // DELETE /api/items/:id

@@ -70,3 +70,17 @@ export function deleteItem(id: string): boolean {
   return result.changes > 0;
 }
 
+export function updateItem(id: string, fields: { name?: string; description?: string }): ItemRow | null {
+  const existing = getItemById(id);
+  if (!existing) return null;
+
+  const name = fields.name ?? existing.name;
+  const description = fields.description ?? existing.description;
+
+  db.prepare(
+    'UPDATE items SET name = ?, description = ? WHERE id = ?'
+  ).run(name, description, id);
+
+  return { id, name, description, createdAt: existing.createdAt };
+}
+
