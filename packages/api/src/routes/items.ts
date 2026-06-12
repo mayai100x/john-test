@@ -1,11 +1,12 @@
 import { Router, Request, Response } from 'express';
-import { getAllItems, getItemById, createItem, deleteItem } from '../db/database';
+import { getAllItems, getItemById, createItem, deleteItem, searchItems } from '../db/database';
 
 export const itemsRouter = Router();
 
-// GET /api/items
-itemsRouter.get('/', (_req: Request, res: Response) => {
-  const result = getAllItems();
+// GET /api/items?q=searchterm
+itemsRouter.get('/', (req: Request, res: Response) => {
+  const q = typeof req.query.q === 'string' ? req.query.q.trim() : '';
+  const result = q ? searchItems(q) : getAllItems();
   res.json({ data: result.data, total: result.total });
 });
 

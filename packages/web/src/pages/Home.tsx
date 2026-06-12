@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { fetchItems, createItem, deleteItem, checkHealth } from '../api/client';
 import { addActivityEntry, getActivityLog } from '../lib/activityLog';
 
@@ -18,10 +18,28 @@ export function HomePage() {
   const [error, setError] = useState<string | null>(null);
   const [activityCount, setActivityCount] = useState(0);
 
-  const load = async () => {
+  // Search state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [totalItems, setTotalItems] = useState(0);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Debounce search input
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 300);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [searchQuery]);
+
+  const load = async (query?: string) => {
     try {
-      const [itemsRes, health] = await Promise.all([fetchItems(), checkHealth()]);
+      const [itemsRes, health] = await Promise.all([fetchItems(query), checkHealth()]);
       setItems(itemsRes.data);
+      setTotalItems(itemsRes.total);
       setStatus(health.status);
       setError(null);
     } catch (e) {
@@ -29,10 +47,11 @@ export function HomePage() {
     }
   };
 
+  // Reload when debounced query changes
   useEffect(() => {
-    load();
+    load(debouncedQuery || undefined);
     setActivityCount(getActivityLog().length);
-  }, []);
+  }, [debouncedQuery]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +63,7 @@ export function HomePage() {
       addActivityEntry('created', name);
       setName('');
       setDesc('');
-      await load();
+      await load(debouncedQuery || undefined);
       setActivityCount(getActivityLog().length);
     } catch (e) {
       setError((e as Error).message);
@@ -57,7 +76,7 @@ export function HomePage() {
     try {
       await deleteItem(id);
       addActivityEntry('deleted', itemName);
-      await load();
+      await load(debouncedQuery || undefined);
       setActivityCount(getActivityLog().length);
     } catch (e) {
       setError((e as Error).message);
@@ -106,6 +125,24 @@ export function HomePage() {
 
       <section className="items-section">
         <h2>Items</h2>
+
+        {/* Search */}
+        <div className="search-bar">
+          <input
+            placeholder="Search items..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button
+              className="clear-search-btn"
+              onClick={() => setSearchQuery('')}
+            >
+              ✕
+            </button>
+          )}
+        </div>
+
         <form onSubmit={handleCreate} className="create-form">
           <input
             placeholder="Item name"
@@ -123,7 +160,17 @@ export function HomePage() {
         </form>
 
         <div className="items">
-          {items.length === 0 && <p className="empty">No items yet. Create one above!</p>}
+          {debouncedQuery && (
+            <p className="results-count">
+              Showing {items.length} of {totalItems} items
+            </p>
+          )}
+          {items.length === 0 && !debouncedQuery && (
+            <p className="empty">No items yet. Create one above!</p>
+          )}
+          {items.length === 0 && debouncedQuery && (
+            <p className="empty">No items match "{debouncedQuery}"</p>
+          )}
           {items.map((item) => (
             <div key={item.id} className="card">
               <div>

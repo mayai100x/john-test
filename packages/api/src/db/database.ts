@@ -70,3 +70,11 @@ export function deleteItem(id: string): boolean {
   return result.changes > 0;
 }
 
+export function searchItems(query: string): { data: ItemRow[]; total: number } {
+  const pattern = `%${query}%`;
+  const items = db.prepare(
+    'SELECT id, name, description, created_at AS createdAt FROM items WHERE name LIKE ? OR description LIKE ? ORDER BY created_at ASC'
+  ).all(pattern, pattern) as ItemRow[];
+  return { data: items, total: items.length };
+}
+
